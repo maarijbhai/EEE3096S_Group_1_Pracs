@@ -31,6 +31,12 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define MAX_ITER 100
+#define SCALE 1000000
+
+// for bit shifting in the fixed point arithmetic function
+#define Q   16			// scale factor
+#define ONE (1 << Q)	// division by scale factor
 
 /* USER CODE END PD */
 
@@ -44,6 +50,13 @@
 /* USER CODE BEGIN PV */
 //TODO: Define variables you think you might need
 // - Performance timing variables (e.g execution time, throughput, pixels per second, clock cycles)
+uint64_t start_time = 0;
+uint64_t end_time = 0;
+int imageDimensions[5] = {128, 160, 192, 224, 256};
+uint64_t checksum = 0;
+uint64_t execution_time = 0;
+int initial_height = 128;
+int initial_width = 128;
 
 /* USER CODE END PV */
 
@@ -52,7 +65,8 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 /* USER CODE BEGIN PFP */
 //TODO: Define any function prototypes you might need such as the calculate Mandelbrot function among others
-
+uint64_t calculate_mandelbrot_fixed_point_arithmetic(int width, int height, int max_iterations);
+uint64_t calculate_mandelbrot_double(int width, int height, int max_iterations);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -101,17 +115,22 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 	  //TODO: Visual indicator: Turn on LED0 to signal processing start
+	  	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
 
 
-	  //TODO: Benchmark and Profile Performance
+	  	  //TODO: Benchmark and Profile Performance
 
 
-	  //TODO: Visual indicator: Turn on LED1 to signal processing start
+	  	  //TODO: Visual indicator: Turn on LED1 to signal processing start
+	  	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_SET);
 
 
-	  //TODO: Keep the LEDs ON for 2s
+	  	  //TODO: Keep the LEDs ON for 2s
+	  	  HAL_Delay(1000);
 
-	  // TODO: Turn OFF LEDs
+	  	  //TODO: Turn OFF LEDs
+	  	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
+	  	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_RESET);
 
 
 
@@ -194,6 +213,102 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 //TODO: Function signatures you defined previously , implement them here
+uint64_t calculate_mandelbrot_fixed_point_arithmetic(int width, int height, int max_iterations)
+{
+    uint64_t mandelbrot_sum = 0;
+
+    // This function utilizes bit shifting to decreases the computational costs of division on decimals
+
+    // For the initial loop, x and y are zero so instead of computing it and lastly subtracting the step,
+    // this code sets the initial starting point to the constant
+    const int32_t x_left = -( (5 * ONE) / 2 ); // -2.5 as x starting point
+    const int32_t y_top  = -ONE;               // -1.0 as y starting point
+
+    // Instead of recomputing x*... and y*..., we just add the multiplication each loop as it would amount to the same thing
+    // This way addition uses less computational power than multiplication
+    const int32_t x_step = (int32_t)(((int64_t)7 * ONE) / (2 * width));			// The 2 in the denominator makes it 7/2 = 3.5
+    const int32_t y_step = (int32_t)(((int64_t)2 * ONE) / height);				// Bit shift the top before dividing
+
+    const int32_t FOUR = 4 * ONE;				// for condition in while loop
+
+    int32_t y0 = y_top;				// starting constant
+    for (int y = 0; y < height; ++y) {
+        int32_t x0 = x_left;			// starting constant
+
+        for (int x = 0; x < width; ++x) {
+            int32_t xi = 0, yi = 0;
+            int iteration = 0;
+
+            while (iteration < max_iterations) {
+                int32_t xi2 = (int32_t)(((int64_t)xi * xi + (1 << (Q - 1))) >> Q);
+                int32_t yi2 = (int32_t)(((int64_t)yi * yi + (1 << (Q - 1))) >> Q);
+
+                // after calculating square values for this loop check if condition is still met
+                if ((int64_t)xi2 + yi2 > FOUR) break;
+
+                int32_t temp = xi2 - yi2 + x0;
+
+                // Q is 2^16, so Q-1 = 2^15 to account for 2*xi*yi
+                yi = (int32_t)(((int64_t)xi * yi + (1 << (Q - 2))) >> (Q - 1)) + y0;
+                xi = temp;           // following mandelbrot.py
+
+                ++iteration;
+            }
+
+            mandelbrot_sum += iteration;
+            x0 += x_step; // add step instead of multiplying new x value
+        }
+        y0 += y_step;     // add step instead of multiplying new y value
+    }
+
+    return mandelbrot_sum;
+}
+
+
+//TODO: Mandelbroat using variable type double
+uint64_t calculate_mandelbrot_double(int width, int height, int max_iterations)
+{
+    uint64_t mandelbrot_sum = 0;
+    //TODO: Complete the function implementation
+    checksum = 0;
+    for (int y = 0; y < height; y++)
+    {
+    	for (int x = 0; x < width ; x++)
+    	{
+    		double x_0 = ((double)x/width)*3.5 - 2.5;
+    		double y_0 = (double)y/height * 2.0 - 1.0;
+
+    		double x_i = 0;
+    		double y_i = 0;
+    		int iteration = 0;
+
+
+    		while (iteration < max_iterations)
+    		{
+
+    			double x_i_sq = x_i*x_i;
+    			double y_i_sq = y_i*y_i;
+
+    			if(x_i_sq + y_i_sq > 4.0)
+    			{
+    				break;
+    			}
+    			double temp  = x_i_sq - y_i_sq;
+    			y_i = 2.0*x_i*y_i + y_0;
+
+    			x_i = temp + x_0;
+
+    			iteration = iteration +1;
+
+    		}
+
+    		mandelbrot_sum = mandelbrot_sum + iteration;
+
+    	}
+    }
+    //checksum = mandelbrot_sum;
+    return mandelbrot_sum;
+}
 
 /* USER CODE END 4 */
 
