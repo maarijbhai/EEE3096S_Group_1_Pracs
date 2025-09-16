@@ -55,8 +55,15 @@ uint64_t end_time = 0;
 int imageDimensions[5] = {128, 160, 192, 224, 256};
 uint64_t checksum = 0;
 uint64_t execution_time = 0;
+uint64_t timeArray_arithmetic[5] = {0, 0, 0, 0, 0};
+uint64_t timeArray_double[5] = {0, 0, 0, 0, 0};
+uint64_t checksumArray_arithmetic[5] = {0, 0, 0, 0, 0};
+uint64_t checksumArray_double[5] = {0, 0, 0, 0, 0};
 int initial_height = 128;
 int initial_width = 128;
+
+char Line[500];
+int iterationsArray[5] = {250, 500, 750, 1000};
 
 /* USER CODE END PV */
 
@@ -67,6 +74,7 @@ static void MX_GPIO_Init(void);
 //TODO: Define any function prototypes you might need such as the calculate Mandelbrot function among others
 uint64_t calculate_mandelbrot_fixed_point_arithmetic(int width, int height, int max_iterations);
 uint64_t calculate_mandelbrot_double(int width, int height, int max_iterations);
+void task1(int iter);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -119,6 +127,7 @@ int main(void)
 
 
 	  	  //TODO: Benchmark and Profile Performance
+	  	  task1(1000);
 
 
 	  	  //TODO: Visual indicator: Turn on LED1 to signal processing start
@@ -308,6 +317,32 @@ uint64_t calculate_mandelbrot_double(int width, int height, int max_iterations)
     }
     //checksum = mandelbrot_sum;
     return mandelbrot_sum;
+}
+
+void task1(int iter) {
+	for (int i=0; i<5; i++) {
+		  start_time = HAL_GetTick();
+
+		  checksum = calculate_mandelbrot_fixed_point_arithmetic(imageDimensions[i], imageDimensions[i], iter);
+
+		  end_time = HAL_GetTick();
+
+		  execution_time = end_time - start_time;
+		  timeArray_arithmetic[i] = execution_time;
+		  checksumArray_arithmetic[i] = checksum;
+	}
+
+	for (int i=0; i<5; i++) {
+		  start_time = HAL_GetTick();
+
+		  checksum = calculate_mandelbrot_double(imageDimensions[i], imageDimensions[i], iter);
+
+		  end_time = HAL_GetTick();
+
+		  execution_time = end_time - start_time;
+		  timeArray_double[i] = execution_time;
+		  checksumArray_double[i] = checksum;
+		}
 }
 
 /* USER CODE END 4 */

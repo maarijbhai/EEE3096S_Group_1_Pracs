@@ -18,6 +18,8 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include <inttypes.h>  // for PRIu64
+#include <string.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -55,8 +57,15 @@ uint64_t end_time = 0;
 int imageDimensions[5] = {128, 160, 192, 224, 256};
 uint64_t checksum = 0;
 uint64_t execution_time = 0;
+uint64_t timeArray_arithmetic[5] = {0, 0, 0, 0, 0};
+uint64_t timeArray_double[5] = {0, 0, 0, 0, 0};
+uint64_t checksumArray_arithmetic[5] = {0, 0, 0, 0, 0};
+uint64_t checksumArray_double[5] = {0, 0, 0, 0, 0};
 int initial_height = 128;
 int initial_width = 128;
+
+char Line[500];
+int iterationsArray[5] = {250, 500, 750, 1000};
 
 /* USER CODE END PV */
 
@@ -67,6 +76,8 @@ static void MX_GPIO_Init(void);
 //TODO: Define any function prototypes you might need such as the calculate Mandelbrot function among others
 uint64_t calculate_mandelbrot_fixed_point_arithmetic(int width, int height, int max_iterations);
 uint64_t calculate_mandelbrot_double(int width, int height, int max_iterations);
+void task1(int iter);
+void task2();
 
 /* USER CODE END PFP */
 
@@ -106,20 +117,15 @@ int main(void)
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
 
-  /* USER CODE END 2 */
+  /* USER CODE END WHILE */
 
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-    /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
+  /* USER CODE BEGIN 3 */
 	  //TODO: Visual indicator: Turn on LED0 to signal processing start
 	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
 
 
 	  //TODO: Benchmark and Profile Performance
+	  task1(1000);
 
 
 	  //TODO: Visual indicator: Turn on LED1 to signal processing start
@@ -132,6 +138,35 @@ int main(void)
 	  //TODO: Turn OFF LEDs
 	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
 	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_RESET);
+
+
+  /* USER CODE END 2 */
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+  while (1)
+  {
+//    /* USER CODE END WHILE */
+//
+//    /* USER CODE BEGIN 3 */
+//	  //TODO: Visual indicator: Turn on LED0 to signal processing start
+//	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
+//
+//
+//	  //TODO: Benchmark and Profile Performance
+//	  task1();
+//
+//
+//	  //TODO: Visual indicator: Turn on LED1 to signal processing start
+//	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_SET);
+//
+//
+//	  //TODO: Keep the LEDs ON for 2s
+//	  HAL_Delay(1000);
+//
+//	  //TODO: Turn OFF LEDs
+//	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
+//	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_RESET);
   }
   /* USER CODE END 3 */
 }
@@ -314,6 +349,58 @@ uint64_t calculate_mandelbrot_double(int width, int height, int max_iterations)
     }
     //checksum = mandelbrot_sum;
     return mandelbrot_sum;
+}
+
+void task1(int iter) {
+	for (int i=0; i<5; i++) {
+		  start_time = HAL_GetTick();
+
+		  checksum = calculate_mandelbrot_fixed_point_arithmetic(imageDimensions[i], imageDimensions[i], iter);
+
+		  end_time = HAL_GetTick();
+
+		  execution_time = end_time - start_time;
+		  timeArray_arithmetic[i] = execution_time;
+		  checksumArray_arithmetic[i] = checksum;
+	}
+
+	for (int i=0; i<5; i++) {
+		  start_time = HAL_GetTick();
+
+		  checksum = calculate_mandelbrot_double(imageDimensions[i], imageDimensions[i], iter);
+
+		  end_time = HAL_GetTick();
+
+		  execution_time = end_time - start_time;
+		  timeArray_double[i] = execution_time;
+		  checksumArray_double[i] = checksum;
+		}
+}
+
+void task2() {
+    Line[0] = '\0';  // start with an empty string
+    char buffer[100]; // temporary buffer for each entry
+
+    for (int i = 0; i < 4; i++) {
+        task1(iterationsArray[i]);
+
+        for (int j = 0; j < 5; j++) {
+            // Format one line of results into buffer
+            sprintf(buffer, "%d, %d, %" PRIu64 ", %" PRIu64 ", %" PRIu64 ", %" PRIu64 ", ",
+                    iterationsArray[i],
+                    imageDimensions[j],
+                    checksumArray_arithmetic[j],
+                    timeArray_arithmetic[j],
+                    checksumArray_double[j],
+                    timeArray_double[j]);
+
+            // Append to Line
+            strcat(Line, buffer);
+        }
+
+        // Optionally, add a newline after each iteration to separate blocks
+        strcat(Line, "\n");
+    }
 }
 
 /* USER CODE END 4 */
