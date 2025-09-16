@@ -36,9 +36,6 @@
 #define MAX_ITER 100
 #define SCALE 1000000
 
-// for bit shifting in the fixed point arithmetic function
-#define Q   16			// scale factor
-#define ONE (1 << Q)	// division by scale factor
 
 /* USER CODE END PD */
 
@@ -57,15 +54,24 @@ uint64_t end_time = 0;
 int imageDimensions[5] = {128, 160, 192, 224, 256};
 uint64_t checksum = 0;
 uint64_t execution_time = 0;
+int initial_height = 128;
+int initial_width = 128;
+
+// arrays for task 1
 uint64_t timeArray_arithmetic[5] = {0, 0, 0, 0, 0};
 uint64_t timeArray_double[5] = {0, 0, 0, 0, 0};
 uint64_t checksumArray_arithmetic[5] = {0, 0, 0, 0, 0};
 uint64_t checksumArray_double[5] = {0, 0, 0, 0, 0};
-int initial_height = 128;
-int initial_width = 128;
 
-char Line[500];
-int iterationsArray[5] = {250, 500, 750, 1000};
+// arrays for task 2
+int iterationsArray[5] = {100, 250, 500, 750, 1000};
+uint64_t task2ArrayChecksum[5][5];
+uint64_t task2ArrayTime[5][5];
+
+// task 7 variables
+int arrayQ[3] = {10 , 13, 20};		// these values are roughly the binary equivalent of 10^3, 10^4 and 10^6
+uint64_t task7ArrayChecksum[3][5];
+uint64_t task7ArrayTime[3][5];
 
 /* USER CODE END PV */
 
@@ -74,10 +80,12 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 /* USER CODE BEGIN PFP */
 //TODO: Define any function prototypes you might need such as the calculate Mandelbrot function among others
-uint64_t calculate_mandelbrot_fixed_point_arithmetic(int width, int height, int max_iterations);
+uint64_t calculate_mandelbrot_fixed_point_arithmetic(int width, int height, int max_iterations, int scale);
 uint64_t calculate_mandelbrot_double(int width, int height, int max_iterations);
 void task1(int iter);
 void task2();
+void task4();
+void task7();
 
 /* USER CODE END PFP */
 
@@ -125,7 +133,7 @@ int main(void)
 
 
 	  //TODO: Benchmark and Profile Performance
-	  task1(1000);
+	  task7();
 
 
 	  //TODO: Visual indicator: Turn on LED1 to signal processing start
@@ -254,8 +262,10 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 //TODO: Function signatures you defined previously , implement them here
-uint64_t calculate_mandelbrot_fixed_point_arithmetic(int width, int height, int max_iterations)
+uint64_t calculate_mandelbrot_fixed_point_arithmetic(int width, int height, int max_iterations, int scale)
 {
+	int Q = scale;
+	unsigned int ONE = 1 << Q;
     uint64_t mandelbrot_sum = 0;
 
     // This function utilizes bit shifting to decreases the computational costs of division on decimals
@@ -355,7 +365,7 @@ void task1(int iter) {
 	for (int i=0; i<5; i++) {
 		  start_time = HAL_GetTick();
 
-		  checksum = calculate_mandelbrot_fixed_point_arithmetic(imageDimensions[i], imageDimensions[i], iter);
+		  checksum = calculate_mandelbrot_fixed_point_arithmetic(imageDimensions[i], imageDimensions[i], iter, 16);
 
 		  end_time = HAL_GetTick();
 
@@ -377,31 +387,66 @@ void task1(int iter) {
 		}
 }
 
+// =============================================================================================================
+/*
+ * This method executes task 2 by performing the Mandelbrot function using the double method
+ * It performs the function with varying max iterations sizes 100, 250, 500, 750, 1000
+ */
 void task2() {
-    Line[0] = '\0';  // start with an empty string
-    char buffer[100]; // temporary buffer for each entry
+	// for looping through iteration sizes
+	for (int j = 0; j<5; j++) {
 
-    for (int i = 0; i < 4; i++) {
-        task1(iterationsArray[i]);
+		// for looping through image sizes
+		for (int i=0; i<5; i++) {
+			  start_time = HAL_GetTick();
 
-        for (int j = 0; j < 5; j++) {
-            // Format one line of results into buffer
-            sprintf(buffer, "%d, %d, %" PRIu64 ", %" PRIu64 ", %" PRIu64 ", %" PRIu64 ", ",
-                    iterationsArray[i],
-                    imageDimensions[j],
-                    checksumArray_arithmetic[j],
-                    timeArray_arithmetic[j],
-                    checksumArray_double[j],
-                    timeArray_double[j]);
+			  // Can change to fixed point arithmetic is comparison between that data is needed
+			  checksum = calculate_mandelbrot_double(imageDimensions[i], imageDimensions[i], iterationsArray[j]);
 
-            // Append to Line
-            strcat(Line, buffer);
-        }
+			  end_time = HAL_GetTick();
 
-        // Optionally, add a newline after each iteration to separate blocks
-        strcat(Line, "\n");
-    }
+			  execution_time = end_time - start_time;
+			  task2ArrayTime[j][i] = execution_time;
+			  task2ArrayChecksum[j][i] = checksum;
+		}
+	}
 }
+
+// =============================================================================================================
+
+void task4() {
+
+}
+
+// =============================================================================================================
+/*
+ * This function performs task 7 of Practical 3
+ * It performs the fixed point arithmetic Mandelbrot function with varying scale factors
+ * The scale factors are the binary equivalents of 10^3, 10^4, 10^6
+ * i.e 2^10, 2^13, 2^20
+ */
+void task7() {
+
+	for (int j=0; j<3; j++) {
+
+		for (int i=0; i<5; i++) {
+				  start_time = HAL_GetTick();
+
+				  checksum = calculate_mandelbrot_fixed_point_arithmetic(imageDimensions[i], imageDimensions[i], MAX_ITER, arrayQ[j]);
+
+				  end_time = HAL_GetTick();
+
+				  execution_time = end_time - start_time;
+				  task7ArrayTime[j][i] = execution_time;
+				  task7ArrayChecksum[j][i] = checksum;
+		}
+
+	}
+
+}
+
+// =============================================================================================================
+
 
 /* USER CODE END 4 */
 
