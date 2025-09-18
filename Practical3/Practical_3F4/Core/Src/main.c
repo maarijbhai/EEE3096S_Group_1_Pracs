@@ -34,7 +34,7 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define MAX_ITER 100
-#define SCALE 1000000
+#define MEMORY_LIMIT 144000
 
 
 /* USER CODE END PD */
@@ -67,6 +67,17 @@ uint64_t checksumArray_double[5] = {0, 0, 0, 0, 0};
 int iterationsArray[5] = {100, 250, 500, 750, 1000};
 uint64_t task2ArrayChecksum[5][5];
 uint64_t task2ArrayTime[5][5];
+
+// task 4 variables
+const int sizes[5][2] = {   // gradually increasing quality
+		{160, 120},     // small
+		{320, 240},     // QVGA
+		{640, 480},     // VGA
+		{1280, 720},    // HD
+		{1920, 1080}    // Full HD
+};
+uint64_t task4ArrayChecksum[5];
+uint64_t task4ArrayTime[5];
 
 // task 7 variables
 int arrayQ[3] = {10 , 13, 20};		// these values are roughly the binary equivalent of 10^3, 10^4 and 10^6
@@ -133,7 +144,7 @@ int main(void)
 
 
 	  //TODO: Benchmark and Profile Performance
-	  task7();
+	  task4();
 
 
 	  //TODO: Visual indicator: Turn on LED1 to signal processing start
@@ -414,7 +425,42 @@ void task2() {
 
 // =============================================================================================================
 
+/*
+ * Check if image size is too big then process the image size
+ * If the image is too big, split the image in half and perform the experiment with the two halves before adding them
+ */
 void task4() {
+
+	for (int i=0; i<5; i++) {
+		int width = sizes[i][0];
+		int height = sizes[i][1];
+
+	    start_time = HAL_GetTick();
+
+		if (width * height * sizeof(uint32_t) <= MEMORY_LIMIT) {
+			// Direct calculation
+			checksum = calculate_mandelbrot_double(width, height, MAX_ITER);
+
+		} else {
+			// Splitting method
+
+			int split_height = height / 2;  // split image into 2 horizontal halves
+
+			checksum = 0.0;
+
+			// Process first half
+			checksum += calculate_mandelbrot_double(width, split_height, MAX_ITER);
+
+			// Process second half
+			checksum += calculate_mandelbrot_double(width, height - split_height, MAX_ITER);
+		}
+
+		end_time = HAL_GetTick();
+
+		execution_time = end_time - start_time;
+	    task4ArrayTime[i] = execution_time;
+	    task4ArrayChecksum[i] = checksum;
+	}
 
 }
 
