@@ -18,6 +18,10 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "stm32f4xx_hal.h"
+#include <stdint.h>
+#include <stdio.h>
+#include "core_cm4.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -55,8 +59,12 @@ uint64_t end_time = 0;
 int imageDimensions[5] = {128, 160, 192, 224, 256};
 uint64_t checksum = 0;
 uint64_t execution_time = 0;
-int initial_height = 128;
-int initial_width = 128;
+int initial_height = 256;
+int initial_width = 256;
+
+volatile uint64_t cycles;
+volatile double throughput;
+
 
 /* USER CODE END PV */
 
@@ -67,6 +75,9 @@ static void MX_GPIO_Init(void);
 //TODO: Define any function prototypes you might need such as the calculate Mandelbrot function among others
 uint64_t calculate_mandelbrot_fixed_point_arithmetic(int width, int height, int max_iterations);
 uint64_t calculate_mandelbrot_double(int width, int height, int max_iterations);
+static inline void cycle_counter_init(void);
+static inline uint32_t cycle_counter_get(void);
+static inline uint64_t cycle_diff(uint32_t start, uint32_t end);
 
 /* USER CODE END PFP */
 
@@ -105,6 +116,48 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
+
+
+
+   cycle_counter_init();
+   start_time = HAL_GetTick();
+
+
+   uint32_t pixels = initial_height*initial_width;
+   //getting the start cycle to get the cycle count
+   uint32_t start_cycle = cycle_counter_get();
+
+
+    //TODO: Call the Mandelbrot Function and store the output in the checksum variable defined initially
+   checksum = calculate_mandelbrot_fixed_point_arithmetic(initial_width, initial_height, MAX_ITER);
+    //checksum = calculate_mandelbrot_double(initial_width, initial_height, MAX_ITER);
+
+    //TODO: Record the end time
+   end_time = HAL_GetTick();
+
+
+
+
+   //getting the end cycle to get the cycle count
+   uint32_t end_cycle = cycle_counter_get();
+
+    cycles = cycle_diff(start_cycle,end_cycle);
+
+    //TODO: Calculate the execution time
+   execution_time = end_time - start_time;
+
+   throughput = (double)pixels / ((double)execution_time / 1000.0);
+
+
+    //TODO: Turn on LED 1 to signify the end of the operation
+   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_SET);
+
+    //TODO: Hold the LEDs on for a 1s delay
+   HAL_Delay(1000);
+
+    //TODO: Turn off the LEDs
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_RESET);
 
   /* USER CODE END 2 */
 
@@ -316,6 +369,26 @@ uint64_t calculate_mandelbrot_double(int width, int height, int max_iterations)
     return mandelbrot_sum;
 }
 
+
+
+static inline void cycle_counter_init(void)
+ {
+	  CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+	  DWT->CYCCNT = 0;
+	  DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+ }
+
+
+ static inline uint32_t cycle_counter_get(void)
+ {
+     return DWT->CYCCNT;
+ }
+
+ static inline uint64_t cycle_diff(uint32_t start, uint32_t end)
+ {
+     return (end >= start) ? (uint64_t)(end - start)
+                           : (uint64_t)(0x100000000ULL - start + end);
+ }
 /* USER CODE END 4 */
 
 /**
