@@ -83,6 +83,11 @@ int arrayQ[3] = {10 , 13, 20};		// these values are roughly the binary equivalen
 uint64_t task7ArrayChecksum[3][5];
 uint64_t task7ArrayTime[3][5];
 
+// mj variables
+//volatile uint64_t cycles;
+//volatile double throughput;
+uint32_t runtime = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -96,6 +101,9 @@ void task1(int iter);
 void task2();
 void task4();
 void task7();
+static inline void cycle_counter_init(void);
+static inline uint32_t cycle_counter_get(void);
+static inline uint64_t cycle_diff(uint32_t start, uint32_t end);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -134,23 +142,75 @@ int main(void)
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
 
+  // ===================================================================================
+
+  /*
+   * Code for cycle functions
+   * uint32_t pixels = initial_height*initial_width;
+
+  for(int i = 0; i< 5; i++)
+  {
+
+
+  cycle_counter_init();
+  start_time = HAL_GetTick();
+
+  //getting the start cycle to get the cycle count
+  uint32_t start_cycle = cycle_counter_get();
+
+
+      //TODO: Call the Mandelbrot Function and store the output in the checksum variable defined initially
+  checksum = calculate_mandelbrot_fixed_point_arithmetic(imageDimensions[i], imageDimensions[i], MAX_ITER);
+  //checksum = calculate_mandelbrot_double(initial_width, initial_height, MAX_ITER);
+
+      //TODO: Record the end time
+  end_time = HAL_GetTick();
+
+
+
+
+     //getting the end cycle to get the cycle count
+  uint32_t end_cycle = cycle_counter_get();
+
+  //cycles = cycle_diff(start_cycle,end_cycle);
+
+  //TODO: Calculate the execution time
+  execution_time = end_time - start_time;
+
+  //throughput = (double)pixels / ((double)execution_time / 1000.0);
+
+  /* USER CODE END 2 */
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+
+
+
+  //}
+  //runtime = HAL_GetTick();
+
+
+  // ===================================================================================
+
+
+
   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
 
 
- 	  	  //TODO: Benchmark and Profile Performance
- 	  	  checksum = calculate_mandelbrot_fixed_point_arithmetic(512, 512, 100, 16);
+  //TODO: Benchmark and Profile Performance
+  checksum = calculate_mandelbrot_fixed_point_arithmetic(512, 512, 100, 16);
 
 
- 	  	  //TODO: Visual indicator: Turn on LED1 to signal processing start
- 	  	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_SET);
+  //TODO: Visual indicator: Turn on LED1 to signal processing start
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_SET);
 
 
- 	  	  //TODO: Keep the LEDs ON for 2s
- 	  	  HAL_Delay(1000);
+  //TODO: Keep the LEDs ON for 2s
+  HAL_Delay(1000);
 
- 	  	  //TODO: Turn OFF LEDs
- 	  	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
- 	  	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_RESET);
+  //TODO: Turn OFF LEDs
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_RESET);
 
   /* USER CODE END 2 */
 
@@ -467,6 +527,30 @@ void task7() {
 
 	}
 
+}
+
+// =============================================================================================================
+
+static inline void cycle_counter_init(void)
+{
+    __HAL_RCC_TIM2_CLK_ENABLE();
+    TIM2->PSC = 0;              // no prescaler
+    TIM2->ARR = 0xFFFFFFFF;     // auto-reload max
+    TIM2->CNT = 0;
+    TIM2->CR1 |= TIM_CR1_CEN;   // enable
+}
+
+static inline uint64_t cycle_diff(uint32_t start, uint32_t end)
+{
+    return (end >= start) ? (uint64_t)(end - start)
+                          : (uint64_t)(0x100000000ULL - start + end);
+}
+
+
+
+static inline uint32_t cycle_counter_get(void)
+{
+    return TIM2->CNT;
 }
 
 // =============================================================================================================

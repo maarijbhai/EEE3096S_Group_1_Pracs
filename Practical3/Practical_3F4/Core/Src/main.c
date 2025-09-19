@@ -84,6 +84,15 @@ int arrayQ[3] = {10 , 13, 20};		// these values are roughly the binary equivalen
 uint64_t task7ArrayChecksum[3][5];
 uint64_t task7ArrayTime[3][5];
 
+// MJ variables
+volatile double time_sec;
+volatile uint32_t total_runtime_ms;
+uint64_t  checkSumArr[5] = {0};
+uint64_t execution_timeArr[5] = {0};
+//volatile uint64_t cycles;
+//volatile double throughput;
+uint32_t runtime = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -97,6 +106,9 @@ void task1(int iter);
 void task2();
 void task4();
 void task7();
+static inline void cycle_counter_init(void);
+static inline uint32_t cycle_counter_get(void);
+static inline uint64_t cycle_diff(uint32_t start, uint32_t end);
 
 /* USER CODE END PFP */
 
@@ -136,27 +148,79 @@ int main(void)
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
 
+  // ======================================================================================
+
+/*
+ * uint32_t start, end;
+
+
+   cycle_counter_init();
+
+   for(int i = 0; i < 5; i++)
+   {
+
+
+   start_time = HAL_GetTick();
+   start = DWT->CYCCNT;
+
+
+
+   //uint32_t pixels = initial_height*initial_width;
+   //getting the start cycle to get the cycle count
+   uint32_t start_cycle = cycle_counter_get();
+
+
+    //TODO: Call the Mandelbrot Function and store the output in the checksum variable defined initially
+    //checksum = calculate_mandelbrot_fixed_point_arithmetic(imageDimensions[i], imageDimensions[i], MAX_ITER);
+    //checksum = calculate_mandelbrot_double(imageDimensions[i], imageDimensions[i], MAX_ITER);
+   checkSumArr[i] = calculate_mandelbrot_float(imageDimensions[i], imageDimensions[i], MAX_ITER);
+
+    //TODO: Record the end time
+   end_time = HAL_GetTick();
+
+
+   end = DWT->CYCCNT;
+   uint32_t cycles = end - start;
+   time_sec = (double)cycles / SystemCoreClock;
+
+
+
+
+
+   //getting the end cycle to get the cycle count
+   uint32_t end_cycle = cycle_counter_get();
+
+    cycles = cycle_diff(start_cycle,end_cycle);
+
+    //TODO: Calculate the execution time
+   execution_timeArr[i] = end_time - start_time;
+ */
+
+  // ======================================================================================
+
+
+
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-	  //TODO: Visual indicator: Turn on LED0 to signal processing start
-	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
+  //TODO: Visual indicator: Turn on LED0 to signal processing start
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
 
 
-	  //TODO: Benchmark and Profile Performance
-	  checksum = calculate_mandelbrot_fixed_point_arithmetic(512, 512, 100, 16);
+  //TODO: Benchmark and Profile Performance
+  checksum = calculate_mandelbrot_fixed_point_arithmetic(512, 512, 100, 16);
 
 
-	  //TODO: Visual indicator: Turn on LED1 to signal processing start
-	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_SET);
+  //TODO: Visual indicator: Turn on LED1 to signal processing start
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_SET);
 
 
-	  //TODO: Keep the LEDs ON for 2s
-	  HAL_Delay(1000);
+  //TODO: Keep the LEDs ON for 2s
+  HAL_Delay(1000);
 
-	  //TODO: Turn OFF LEDs
-	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_RESET);
+  //TODO: Turn OFF LEDs
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_RESET);
 
 
   /* USER CODE END 2 */
@@ -327,6 +391,51 @@ uint64_t calculate_mandelbrot_fixed_point_arithmetic(int width, int height, int 
 }
 
 
+// ====================================================================================================
+
+uint64_t calculate_mandelbrot_float(int width, int height, int max_iterations)
+{
+    uint64_t mandelbrot_sum = 0;
+    //TODO: Complete the function implementation
+    checksum = 0;
+    for (int y = 0; y < height; y++)
+    {
+        for (int x = 0; x < width ; x++)
+        {
+            float x_0 = ((float)x / width) * 3.5f - 2.5f;
+            float y_0 = (float)y / height * 2.0f - 1.0f;
+
+            float x_i = 0.0f;
+            float y_i = 0.0f;
+            int iteration = 0;
+
+            while (iteration < max_iterations)
+            {
+                float x_i_sq = x_i * x_i;
+                float y_i_sq = y_i * y_i;
+
+                if (x_i_sq + y_i_sq > 4.0f)
+                {
+                    break;
+                }
+                float temp = x_i_sq - y_i_sq;
+                y_i = 2.0f * x_i * y_i + y_0;
+
+                x_i = temp + x_0;
+
+                iteration = iteration + 1;
+            }
+
+            mandelbrot_sum = mandelbrot_sum + iteration;
+        }
+    }
+    //checksum = mandelbrot_sum;
+    return mandelbrot_sum;
+}
+
+// =======================================================================================================
+
+
 //TODO: Mandelbroat using variable type double
 uint64_t calculate_mandelbrot_double(int width, int height, int max_iterations)
 {
@@ -490,6 +599,28 @@ void task7() {
 	}
 
 }
+
+// =============================================================================================================
+
+static inline void cycle_counter_init(void)
+ {
+	  CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+	  DWT->CYCCNT = 0;
+	  DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+ }
+
+
+
+ static inline uint32_t cycle_counter_get(void)
+ {
+     return DWT->CYCCNT;
+ }
+
+ static inline uint64_t cycle_diff(uint32_t start, uint32_t end)
+ {
+     return (end >= start) ? (uint64_t)(end - start)
+                           : (uint64_t)(0x100000000ULL - start + end);
+ }
 
 // =============================================================================================================
 

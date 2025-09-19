@@ -96,6 +96,7 @@ Discarded input sections
  .text.task2    0x00000000       0xbc build/main.o
  .text.task4    0x00000000      0x104 build/main.o
  .text.task7    0x00000000       0xc0 build/main.o
+ .bss.runtime   0x00000000        0x4 build/main.o
  .bss.task7ArrayTime
                 0x00000000       0x78 build/main.o
  .bss.task7ArrayChecksum
@@ -1458,27 +1459,27 @@ LOAD C:/ST/STM32CubeIDE_1.19.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.ext
  .comment       0x00000043       0x44 build/stm32f0xx_hal_cortex.o
  .comment       0x00000043       0x44 build/system_stm32f0xx.o
 
-.debug_info     0x00000000     0x3a82
- .debug_info    0x00000000     0x1168 build/main.o
- .debug_info    0x00001168      0x100 build/stm32f0xx_it.o
- .debug_info    0x00001268      0x1d9 build/stm32f0xx_hal_msp.o
- .debug_info    0x00001441      0xb63 build/stm32f0xx_hal_rcc.o
- .debug_info    0x00001fa4      0x833 build/stm32f0xx_hal.o
- .debug_info    0x000027d7      0x6d2 build/stm32f0xx_hal_gpio.o
- .debug_info    0x00002ea9      0x8ed build/stm32f0xx_hal_cortex.o
- .debug_info    0x00003796      0x2bc build/system_stm32f0xx.o
- .debug_info    0x00003a52       0x30 build/startup_stm32f051x8.o
+.debug_info     0x00000000     0x3aa2
+ .debug_info    0x00000000     0x1188 build/main.o
+ .debug_info    0x00001188      0x100 build/stm32f0xx_it.o
+ .debug_info    0x00001288      0x1d9 build/stm32f0xx_hal_msp.o
+ .debug_info    0x00001461      0xb63 build/stm32f0xx_hal_rcc.o
+ .debug_info    0x00001fc4      0x833 build/stm32f0xx_hal.o
+ .debug_info    0x000027f7      0x6d2 build/stm32f0xx_hal_gpio.o
+ .debug_info    0x00002ec9      0x8ed build/stm32f0xx_hal_cortex.o
+ .debug_info    0x000037b6      0x2bc build/system_stm32f0xx.o
+ .debug_info    0x00003a72       0x30 build/startup_stm32f051x8.o
 
-.debug_abbrev   0x00000000     0x1006
- .debug_abbrev  0x00000000      0x342 build/main.o
- .debug_abbrev  0x00000342       0x80 build/stm32f0xx_it.o
- .debug_abbrev  0x000003c2       0xc1 build/stm32f0xx_hal_msp.o
- .debug_abbrev  0x00000483      0x2b4 build/stm32f0xx_hal_rcc.o
- .debug_abbrev  0x00000737      0x268 build/stm32f0xx_hal.o
- .debug_abbrev  0x0000099f      0x222 build/stm32f0xx_hal_gpio.o
- .debug_abbrev  0x00000bc1      0x2f4 build/stm32f0xx_hal_cortex.o
- .debug_abbrev  0x00000eb5      0x134 build/system_stm32f0xx.o
- .debug_abbrev  0x00000fe9       0x1d build/startup_stm32f051x8.o
+.debug_abbrev   0x00000000      0xfdb
+ .debug_abbrev  0x00000000      0x317 build/main.o
+ .debug_abbrev  0x00000317       0x80 build/stm32f0xx_it.o
+ .debug_abbrev  0x00000397       0xc1 build/stm32f0xx_hal_msp.o
+ .debug_abbrev  0x00000458      0x2b4 build/stm32f0xx_hal_rcc.o
+ .debug_abbrev  0x0000070c      0x268 build/stm32f0xx_hal.o
+ .debug_abbrev  0x00000974      0x222 build/stm32f0xx_hal_gpio.o
+ .debug_abbrev  0x00000b96      0x2f4 build/stm32f0xx_hal_cortex.o
+ .debug_abbrev  0x00000e8a      0x134 build/system_stm32f0xx.o
+ .debug_abbrev  0x00000fbe       0x1d build/startup_stm32f051x8.o
 
 .debug_loc      0x00000000     0x1f5d
  .debug_loc     0x00000000      0xbdc build/main.o
@@ -1521,28 +1522,28 @@ LOAD C:/ST/STM32CubeIDE_1.19.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.ext
  .debug_ranges  0x000003f0       0x18 build/system_stm32f0xx.o
  .debug_ranges  0x00000408       0x20 build/startup_stm32f051x8.o
 
-.debug_line     0x00000000     0x31f4
- .debug_line    0x00000000      0x99f build/main.o
- .debug_line    0x0000099f       0xdf build/stm32f0xx_it.o
- .debug_line    0x00000a7e      0x27a build/stm32f0xx_hal_msp.o
- .debug_line    0x00000cf8      0xd39 build/stm32f0xx_hal_rcc.o
- .debug_line    0x00001a31      0x62d build/stm32f0xx_hal.o
- .debug_line    0x0000205e      0x7b4 build/stm32f0xx_hal_gpio.o
- .debug_line    0x00002812      0x63e build/stm32f0xx_hal_cortex.o
- .debug_line    0x00002e50      0x330 build/system_stm32f0xx.o
- .debug_line    0x00003180       0x74 build/startup_stm32f051x8.o
+.debug_line     0x00000000     0x31f2
+ .debug_line    0x00000000      0x99d build/main.o
+ .debug_line    0x0000099d       0xdf build/stm32f0xx_it.o
+ .debug_line    0x00000a7c      0x27a build/stm32f0xx_hal_msp.o
+ .debug_line    0x00000cf6      0xd39 build/stm32f0xx_hal_rcc.o
+ .debug_line    0x00001a2f      0x62d build/stm32f0xx_hal.o
+ .debug_line    0x0000205c      0x7b4 build/stm32f0xx_hal_gpio.o
+ .debug_line    0x00002810      0x63e build/stm32f0xx_hal_cortex.o
+ .debug_line    0x00002e4e      0x330 build/system_stm32f0xx.o
+ .debug_line    0x0000317e       0x74 build/startup_stm32f051x8.o
 
-.debug_str      0x00000000     0x1231
- .debug_str     0x00000000     0x1231 build/main.o
-                                0x786 (size before relaxing)
- .debug_str     0x00001231      0x1ff build/stm32f0xx_it.o
- .debug_str     0x00001231      0x229 build/stm32f0xx_hal_msp.o
- .debug_str     0x00001231      0x685 build/stm32f0xx_hal_rcc.o
- .debug_str     0x00001231      0x709 build/stm32f0xx_hal.o
- .debug_str     0x00001231      0x424 build/stm32f0xx_hal_gpio.o
- .debug_str     0x00001231      0x64a build/stm32f0xx_hal_cortex.o
- .debug_str     0x00001231      0x2a1 build/system_stm32f0xx.o
- .debug_str     0x00001231       0xae build/startup_stm32f051x8.o
+.debug_str      0x00000000     0x1239
+ .debug_str     0x00000000     0x1239 build/main.o
+                                0x78e (size before relaxing)
+ .debug_str     0x00001239      0x1ff build/stm32f0xx_it.o
+ .debug_str     0x00001239      0x229 build/stm32f0xx_hal_msp.o
+ .debug_str     0x00001239      0x685 build/stm32f0xx_hal_rcc.o
+ .debug_str     0x00001239      0x709 build/stm32f0xx_hal.o
+ .debug_str     0x00001239      0x424 build/stm32f0xx_hal_gpio.o
+ .debug_str     0x00001239      0x64a build/stm32f0xx_hal_cortex.o
+ .debug_str     0x00001239      0x2a1 build/system_stm32f0xx.o
+ .debug_str     0x00001239       0xae build/startup_stm32f051x8.o
 
 .debug_frame    0x00000000      0x828
  .debug_frame   0x00000000      0x16c build/main.o
@@ -2047,6 +2048,7 @@ memset                                            C:/ST/STM32CubeIDE_1.19.0/STM3
                                                   C:/ST/STM32CubeIDE_1.19.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344/tools/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp/crt0.o
 pFlash                                            build/stm32f0xx_hal_flash.o
                                                   build/stm32f0xx_hal_flash_ex.o
+runtime                                           build/main.o
 sizes                                             build/main.o
 software_init_hook                                C:/ST/STM32CubeIDE_1.19.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344/tools/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp/crt0.o
 start_time                                        build/main.o
