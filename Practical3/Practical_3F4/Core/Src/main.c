@@ -59,8 +59,9 @@ uint64_t end_time = 0;
 int imageDimensions[5] = {128, 160, 192, 224, 256};
 uint64_t checksum = 0;
 uint64_t execution_time = 0;
-int initial_height = 256;
-int initial_width = 256;
+int initial_height = 128;
+int initial_width = 128;
+volatile double time_sec;
 
 volatile uint64_t cycles;
 volatile double throughput;
@@ -92,6 +93,7 @@ static inline uint64_t cycle_diff(uint32_t start, uint32_t end);
   */
 int main(void)
 {
+	uint32_t program_start = HAL_GetTick();
 
   /* USER CODE BEGIN 1 */
 
@@ -117,10 +119,13 @@ int main(void)
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
 
+  uint32_t start, end;
 
 
    cycle_counter_init();
    start_time = HAL_GetTick();
+   start = DWT->CYCCNT;
+
 
 
    uint32_t pixels = initial_height*initial_width;
@@ -129,11 +134,15 @@ int main(void)
 
 
     //TODO: Call the Mandelbrot Function and store the output in the checksum variable defined initially
-   checksum = calculate_mandelbrot_fixed_point_arithmetic(initial_width, initial_height, MAX_ITER);
-    //checksum = calculate_mandelbrot_double(initial_width, initial_height, MAX_ITER);
+   //checksum = calculate_mandelbrot_fixed_point_arithmetic(initial_width, initial_height, MAX_ITER);
+    checksum = calculate_mandelbrot_double(initial_width, initial_height, MAX_ITER);
 
     //TODO: Record the end time
    end_time = HAL_GetTick();
+   end = DWT->CYCCNT;
+   uint32_t cycles = end - start;
+   time_sec = (double)cycles / SystemCoreClock;
+
 
 
 
@@ -187,6 +196,9 @@ int main(void)
 	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_RESET);
   }
   /* USER CODE END 3 */
+
+  uint32_t program_end = HAL_GetTick();
+  uint32_t total_runtime_ms = program_end - program_start;
 }
 
 /**
@@ -377,6 +389,7 @@ static inline void cycle_counter_init(void)
 	  DWT->CYCCNT = 0;
 	  DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
  }
+
 
 
  static inline uint32_t cycle_counter_get(void)
