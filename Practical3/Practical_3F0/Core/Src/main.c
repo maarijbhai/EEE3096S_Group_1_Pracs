@@ -32,11 +32,9 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define MAX_ITER 100
-#define SCALE 1000000
+#define MEMORY_LIMIT 12000
 
 // for bit shifting in the fixed point arithmetic function
-#define Q   16			// scale factor
-#define ONE (1 << Q)	// division by scale factor
 
 /* USER CODE END PD */
 
@@ -58,6 +56,33 @@ uint64_t execution_time = 0;
 int initial_height = 128;
 int initial_width = 128;
 
+// arrays for task 1
+uint64_t timeArray_arithmetic[5] = {0, 0, 0, 0, 0};
+uint64_t timeArray_double[5] = {0, 0, 0, 0, 0};
+uint64_t checksumArray_arithmetic[5] = {0, 0, 0, 0, 0};
+uint64_t checksumArray_double[5] = {0, 0, 0, 0, 0};
+
+// arrays for task 2
+int iterationsArray[5] = {100, 250, 500, 750, 1000};
+uint64_t task2ArrayChecksum[5][5];
+uint64_t task2ArrayTime[5][5];
+
+// task 4 variables
+const int sizes[5][2] = {   // gradually increasing quality
+		{160, 120},     // small
+		{320, 240},     // QVGA
+		{640, 480},     // VGA
+		{1280, 720},    // HD
+		{1920, 1080}    // Full HD
+};
+uint64_t task4ArrayChecksum[5];
+uint64_t task4ArrayTime[5];
+
+// task 7 variables
+int arrayQ[3] = {10 , 13, 20};		// these values are roughly the binary equivalent of 10^3, 10^4 and 10^6
+uint64_t task7ArrayChecksum[3][5];
+uint64_t task7ArrayTime[3][5];
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -65,8 +90,12 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 /* USER CODE BEGIN PFP */
 //TODO: Define any function prototypes you might need such as the calculate Mandelbrot function among others
-uint64_t calculate_mandelbrot_fixed_point_arithmetic(int width, int height, int max_iterations);
+uint64_t calculate_mandelbrot_fixed_point_arithmetic(int width, int height, int max_iterations, int scale);
 uint64_t calculate_mandelbrot_double(int width, int height, int max_iterations);
+void task1(int iter);
+void task2();
+void task4();
+void task7();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -105,6 +134,24 @@ int main(void)
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
 
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
+
+
+ 	  	  //TODO: Benchmark and Profile Performance
+ 	  	  checksum = calculate_mandelbrot_fixed_point_arithmetic(512, 512, 100, 16);
+
+
+ 	  	  //TODO: Visual indicator: Turn on LED1 to signal processing start
+ 	  	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_SET);
+
+
+ 	  	  //TODO: Keep the LEDs ON for 2s
+ 	  	  HAL_Delay(1000);
+
+ 	  	  //TODO: Turn OFF LEDs
+ 	  	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
+ 	  	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_RESET);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -115,22 +162,7 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 	  //TODO: Visual indicator: Turn on LED0 to signal processing start
-	  	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
 
-
-	  	  //TODO: Benchmark and Profile Performance
-
-
-	  	  //TODO: Visual indicator: Turn on LED1 to signal processing start
-	  	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_SET);
-
-
-	  	  //TODO: Keep the LEDs ON for 2s
-	  	  HAL_Delay(1000);
-
-	  	  //TODO: Turn OFF LEDs
-	  	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
-	  	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_RESET);
 
 
 
@@ -213,8 +245,10 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 //TODO: Function signatures you defined previously , implement them here
-uint64_t calculate_mandelbrot_fixed_point_arithmetic(int width, int height, int max_iterations)
+uint64_t calculate_mandelbrot_fixed_point_arithmetic(int width, int height, int max_iterations, int scale)
 {
+	int Q = scale;
+	unsigned int ONE = 1 << Q;
     uint64_t mandelbrot_sum = 0;
 
     // This function utilizes bit shifting to decreases the computational costs of division on decimals
@@ -309,6 +343,133 @@ uint64_t calculate_mandelbrot_double(int width, int height, int max_iterations)
     //checksum = mandelbrot_sum;
     return mandelbrot_sum;
 }
+
+// =============================================================================================================
+/*
+ * This function accepts a max iteration size and performs Practical 1B Mandelbrot function
+ * It performs the experiment for all image sizes
+ * It also performs both test methods (fixed point arithmetic and double)
+ */
+void task1(int iter) {
+	for (int i=0; i<5; i++) {
+		  start_time = HAL_GetTick();
+
+		  checksum = calculate_mandelbrot_fixed_point_arithmetic(imageDimensions[i], imageDimensions[i], iter, 16);
+
+		  end_time = HAL_GetTick();
+
+		  execution_time = end_time - start_time;
+		  timeArray_arithmetic[i] = execution_time;
+		  checksumArray_arithmetic[i] = checksum;
+	}
+
+	for (int i=0; i<5; i++) {
+		  start_time = HAL_GetTick();
+
+		  checksum = calculate_mandelbrot_double(imageDimensions[i], imageDimensions[i], iter);
+
+		  end_time = HAL_GetTick();
+
+		  execution_time = end_time - start_time;
+		  timeArray_double[i] = execution_time;
+		  checksumArray_double[i] = checksum;
+		}
+}
+
+// =============================================================================================================
+/*
+ * This method executes task 2 by performing the Mandelbrot function using the double method
+ * It performs the function with varying max iterations sizes 100, 250, 500, 750, 1000
+ */
+void task2() {
+	// for looping through iteration sizes
+	for (int j = 0; j<5; j++) {
+
+		// for looping through image sizes
+		for (int i=0; i<5; i++) {
+			  start_time = HAL_GetTick();
+
+			  // Can change to fixed point arithmetic is comparison between that data is needed
+			  checksum = calculate_mandelbrot_double(imageDimensions[i], imageDimensions[i], iterationsArray[j]);
+
+			  end_time = HAL_GetTick();
+
+			  execution_time = end_time - start_time;
+			  task2ArrayTime[j][i] = execution_time;
+			  task2ArrayChecksum[j][i] = checksum;
+		}
+	}
+}
+
+// =============================================================================================================
+
+/*
+ * Check if image size is too big then process the image size
+ * If the image is too big, split the image in half and perform the experiment with the two halves before adding them
+ */
+void task4() {
+
+	for (int i=0; i<5; i++) {
+		int width = sizes[i][0];
+		int height = sizes[i][1];
+
+	    start_time = HAL_GetTick();
+
+		if (width * height * sizeof(uint32_t) <= MEMORY_LIMIT) {
+			// Direct calculation
+			checksum = calculate_mandelbrot_fixed_point_arithmetic(width, height, MAX_ITER, 16);
+
+		} else {
+			// Splitting method
+
+			int split_height = height / 2;  // split image into 2 horizontal halves
+
+			checksum = 0.0;
+
+			// Process first half
+			checksum += calculate_mandelbrot_fixed_point_arithmetic(width, split_height, MAX_ITER, 16);
+
+			// Process second half
+			checksum += calculate_mandelbrot_fixed_point_arithmetic(width, height - split_height, MAX_ITER, 16);
+		}
+
+		end_time = HAL_GetTick();
+
+		execution_time = end_time - start_time;
+	    task4ArrayTime[i] = execution_time;
+	    task4ArrayChecksum[i] = checksum;
+	}
+
+}
+
+// =============================================================================================================
+/*
+ * This function performs task 7 of Practical 3
+ * It performs the fixed point arithmetic Mandelbrot function with varying scale factors
+ * The scale factors are the binary equivalents of 10^3, 10^4, 10^6
+ * i.e 2^10, 2^13, 2^20
+ */
+void task7() {
+
+	for (int j=0; j<3; j++) {
+
+		for (int i=0; i<5; i++) {
+				  start_time = HAL_GetTick();
+
+				  checksum = calculate_mandelbrot_fixed_point_arithmetic(imageDimensions[i], imageDimensions[i], MAX_ITER, arrayQ[j]);
+
+				  end_time = HAL_GetTick();
+
+				  execution_time = end_time - start_time;
+				  task7ArrayTime[j][i] = execution_time;
+				  task7ArrayChecksum[j][i] = checksum;
+		}
+
+	}
+
+}
+
+// =============================================================================================================
 
 /* USER CODE END 4 */
 
