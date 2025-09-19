@@ -144,7 +144,7 @@ int main(void)
 
 
 	  //TODO: Benchmark and Profile Performance
-	  task4();
+	  checksum = calculate_mandelbrot_fixed_point_arithmetic(512, 512, 100, 16);
 
 
 	  //TODO: Visual indicator: Turn on LED1 to signal processing start
@@ -439,7 +439,7 @@ void task4() {
 
 		if (width * height * sizeof(uint32_t) <= MEMORY_LIMIT) {
 			// Direct calculation
-			checksum = calculate_mandelbrot_double(width, height, MAX_ITER);
+			checksum = calculate_mandelbrot_fixed_point_arithmetic(width, height, MAX_ITER, 16);
 
 		} else {
 			// Splitting method
@@ -449,10 +449,10 @@ void task4() {
 			checksum = 0.0;
 
 			// Process first half
-			checksum += calculate_mandelbrot_double(width, split_height, MAX_ITER);
+			checksum += calculate_mandelbrot_fixed_point_arithmetic(width, split_height, MAX_ITER, 16);
 
 			// Process second half
-			checksum += calculate_mandelbrot_double(width, height - split_height, MAX_ITER);
+			checksum += calculate_mandelbrot_fixed_point_arithmetic(width, height - split_height, MAX_ITER, 16);
 		}
 
 		end_time = HAL_GetTick();
