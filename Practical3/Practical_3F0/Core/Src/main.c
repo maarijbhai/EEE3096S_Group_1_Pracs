@@ -61,9 +61,9 @@ uint64_t execution_time = 0;
 int initial_height = 224;
 int initial_width = 224;
 
-volatile uint64_t cycles;
-volatile double throughput;
-
+//volatile uint64_t cycles;
+//volatile double throughput;
+uint32_t runtime = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -116,6 +116,10 @@ int main(void)
 
   uint32_t pixels = initial_height*initial_width;
 
+  for(int i = 0; i< 5; i++)
+  {
+
+
   cycle_counter_init();
   start_time = HAL_GetTick();
 
@@ -124,7 +128,7 @@ int main(void)
 
 
       //TODO: Call the Mandelbrot Function and store the output in the checksum variable defined initially
-  checksum = calculate_mandelbrot_fixed_point_arithmetic(initial_width, initial_height, MAX_ITER);
+  checksum = calculate_mandelbrot_fixed_point_arithmetic(imageDimensions[i], imageDimensions[i], MAX_ITER);
   //checksum = calculate_mandelbrot_double(initial_width, initial_height, MAX_ITER);
 
       //TODO: Record the end time
@@ -136,17 +140,22 @@ int main(void)
      //getting the end cycle to get the cycle count
   uint32_t end_cycle = cycle_counter_get();
 
-  cycles = cycle_diff(start_cycle,end_cycle);
+  //cycles = cycle_diff(start_cycle,end_cycle);
 
   //TODO: Calculate the execution time
   execution_time = end_time - start_time;
 
-  throughput = (double)pixels / ((double)execution_time / 1000.0);
+  //throughput = (double)pixels / ((double)execution_time / 1000.0);
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
+
+
+  }
+  runtime = HAL_GetTick();
   while (1)
   {
     /* USER CODE END WHILE */

@@ -1,4 +1,4 @@
-ARM GAS  C:\Users\maari\AppData\Local\Temp\ccLaxqIj.s 			page 1
+ARM GAS  C:\Users\maari\AppData\Local\Temp\cc42mrRr.s 			page 1
 
 
    1              		.cpu cortex-m0
@@ -10,7 +10,7 @@ ARM GAS  C:\Users\maari\AppData\Local\Temp\ccLaxqIj.s 			page 1
    7              		.eabi_attribute 24, 1
    8              		.eabi_attribute 25, 1
    9              		.eabi_attribute 26, 1
-  10              		.eabi_attribute 30, 1
+  10              		.eabi_attribute 30, 2
   11              		.eabi_attribute 34, 0
   12              		.eabi_attribute 18, 4
   13              		.file	"stm32f0xx_hal_msp.c"
@@ -20,12 +20,13 @@ ARM GAS  C:\Users\maari\AppData\Local\Temp\ccLaxqIj.s 			page 1
   17              		.file 1 "Core/Src/stm32f0xx_hal_msp.c"
   18              		.section	.text.HAL_MspInit,"ax",%progbits
   19              		.align	1
-  20              		.global	HAL_MspInit
-  21              		.syntax unified
-  22              		.code	16
-  23              		.thumb_func
-  25              	HAL_MspInit:
-  26              	.LFB40:
+  20              		.p2align 2,,3
+  21              		.global	HAL_MspInit
+  22              		.syntax unified
+  23              		.code	16
+  24              		.thumb_func
+  26              	HAL_MspInit:
+  27              	.LFB40:
    1:Core/Src/stm32f0xx_hal_msp.c **** /* USER CODE BEGIN Header */
    2:Core/Src/stm32f0xx_hal_msp.c **** /**
    3:Core/Src/stm32f0xx_hal_msp.c ****   ******************************************************************************
@@ -57,10 +58,10 @@ ARM GAS  C:\Users\maari\AppData\Local\Temp\ccLaxqIj.s 			page 1
   29:Core/Src/stm32f0xx_hal_msp.c **** 
   30:Core/Src/stm32f0xx_hal_msp.c **** /* USER CODE END TD */
   31:Core/Src/stm32f0xx_hal_msp.c **** 
+ARM GAS  C:\Users\maari\AppData\Local\Temp\cc42mrRr.s 			page 2
+
+
   32:Core/Src/stm32f0xx_hal_msp.c **** /* Private define ------------------------------------------------------------*/
-ARM GAS  C:\Users\maari\AppData\Local\Temp\ccLaxqIj.s 			page 2
-
-
   33:Core/Src/stm32f0xx_hal_msp.c **** /* USER CODE BEGIN Define */
   34:Core/Src/stm32f0xx_hal_msp.c **** 
   35:Core/Src/stm32f0xx_hal_msp.c **** /* USER CODE END Define */
@@ -93,58 +94,72 @@ ARM GAS  C:\Users\maari\AppData\Local\Temp\ccLaxqIj.s 			page 1
   62:Core/Src/stm32f0xx_hal_msp.c ****   */
   63:Core/Src/stm32f0xx_hal_msp.c **** void HAL_MspInit(void)
   64:Core/Src/stm32f0xx_hal_msp.c **** {
-  27              		.loc 1 64 1 view -0
-  28              		.cfi_startproc
-  29              		@ args = 0, pretend = 0, frame = 8
-  30              		@ frame_needed = 0, uses_anonymous_args = 0
-  31              		@ link register save eliminated.
-  32 0000 82B0     		sub	sp, sp, #8
-  33              	.LCFI0:
-  34              		.cfi_def_cfa_offset 8
+  28              		.loc 1 64 1 view -0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 8
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
   65:Core/Src/stm32f0xx_hal_msp.c **** 
   66:Core/Src/stm32f0xx_hal_msp.c ****   /* USER CODE BEGIN MspInit 0 */
   67:Core/Src/stm32f0xx_hal_msp.c **** 
   68:Core/Src/stm32f0xx_hal_msp.c ****   /* USER CODE END MspInit 0 */
   69:Core/Src/stm32f0xx_hal_msp.c **** 
   70:Core/Src/stm32f0xx_hal_msp.c ****   __HAL_RCC_SYSCFG_CLK_ENABLE();
-  35              		.loc 1 70 3 view .LVU1
-  36              	.LBB2:
-  37              		.loc 1 70 3 view .LVU2
-  38              		.loc 1 70 3 view .LVU3
-  39 0002 0A4B     		ldr	r3, .L2
-  40 0004 9969     		ldr	r1, [r3, #24]
-  41 0006 0122     		movs	r2, #1
-  42 0008 1143     		orrs	r1, r2
-  43 000a 9961     		str	r1, [r3, #24]
-  44              		.loc 1 70 3 view .LVU4
-  45 000c 9969     		ldr	r1, [r3, #24]
-ARM GAS  C:\Users\maari\AppData\Local\Temp\ccLaxqIj.s 			page 3
+  33              		.loc 1 70 3 view .LVU1
+  34              	.LBB2:
+  35              		.loc 1 70 3 view .LVU2
+  36              		.loc 1 70 3 view .LVU3
+  37 0000 0122     		movs	r2, #1
+  38 0002 0A4B     		ldr	r3, .L3
+  39              	.LBE2:
+  64:Core/Src/stm32f0xx_hal_msp.c **** 
+  40              		.loc 1 64 1 is_stmt 0 view .LVU4
+  41 0004 82B0     		sub	sp, sp, #8
+  42              	.LCFI0:
+  43              		.cfi_def_cfa_offset 8
+  44              	.LBB3:
+ARM GAS  C:\Users\maari\AppData\Local\Temp\cc42mrRr.s 			page 3
 
 
-  46 000e 0A40     		ands	r2, r1
-  47 0010 0092     		str	r2, [sp]
-  48              		.loc 1 70 3 view .LVU5
-  49 0012 009A     		ldr	r2, [sp]
-  50              	.LBE2:
-  51              		.loc 1 70 3 view .LVU6
+  45              		.loc 1 70 3 view .LVU5
+  46 0006 9969     		ldr	r1, [r3, #24]
+  47 0008 1143     		orrs	r1, r2
+  48 000a 9961     		str	r1, [r3, #24]
+  49              		.loc 1 70 3 is_stmt 1 view .LVU6
+  50 000c 9969     		ldr	r1, [r3, #24]
+  51 000e 0A40     		ands	r2, r1
+  52              	.LBE3:
+  53              	.LBB4:
   71:Core/Src/stm32f0xx_hal_msp.c ****   __HAL_RCC_PWR_CLK_ENABLE();
-  52              		.loc 1 71 3 view .LVU7
-  53              	.LBB3:
-  54              		.loc 1 71 3 view .LVU8
-  55              		.loc 1 71 3 view .LVU9
-  56 0014 DA69     		ldr	r2, [r3, #28]
-  57 0016 8021     		movs	r1, #128
-  58 0018 4905     		lsls	r1, r1, #21
-  59 001a 0A43     		orrs	r2, r1
-  60 001c DA61     		str	r2, [r3, #28]
-  61              		.loc 1 71 3 view .LVU10
-  62 001e DB69     		ldr	r3, [r3, #28]
-  63 0020 0B40     		ands	r3, r1
-  64 0022 0193     		str	r3, [sp, #4]
-  65              		.loc 1 71 3 view .LVU11
-  66 0024 019B     		ldr	r3, [sp, #4]
-  67              	.LBE3:
-  68              		.loc 1 71 3 view .LVU12
+  54              		.loc 1 71 3 is_stmt 0 view .LVU7
+  55 0010 8021     		movs	r1, #128
+  56              	.LBE4:
+  57              	.LBB5:
+  70:Core/Src/stm32f0xx_hal_msp.c ****   __HAL_RCC_PWR_CLK_ENABLE();
+  58              		.loc 1 70 3 view .LVU8
+  59 0012 0092     		str	r2, [sp]
+  70:Core/Src/stm32f0xx_hal_msp.c ****   __HAL_RCC_PWR_CLK_ENABLE();
+  60              		.loc 1 70 3 is_stmt 1 view .LVU9
+  61 0014 009A     		ldr	r2, [sp]
+  62              	.LBE5:
+  70:Core/Src/stm32f0xx_hal_msp.c ****   __HAL_RCC_PWR_CLK_ENABLE();
+  63              		.loc 1 70 3 view .LVU10
+  64              		.loc 1 71 3 view .LVU11
+  65              	.LBB6:
+  66              		.loc 1 71 3 view .LVU12
+  67              		.loc 1 71 3 view .LVU13
+  68 0016 DA69     		ldr	r2, [r3, #28]
+  69 0018 4905     		lsls	r1, r1, #21
+  70 001a 0A43     		orrs	r2, r1
+  71 001c DA61     		str	r2, [r3, #28]
+  72              		.loc 1 71 3 view .LVU14
+  73 001e DB69     		ldr	r3, [r3, #28]
+  74 0020 0B40     		ands	r3, r1
+  75 0022 0193     		str	r3, [sp, #4]
+  76              		.loc 1 71 3 view .LVU15
+  77 0024 019B     		ldr	r3, [sp, #4]
+  78              	.LBE6:
+  79              		.loc 1 71 3 view .LVU16
   72:Core/Src/stm32f0xx_hal_msp.c **** 
   73:Core/Src/stm32f0xx_hal_msp.c ****   /* System interrupt init*/
   74:Core/Src/stm32f0xx_hal_msp.c **** 
@@ -152,28 +167,31 @@ ARM GAS  C:\Users\maari\AppData\Local\Temp\ccLaxqIj.s 			page 1
   76:Core/Src/stm32f0xx_hal_msp.c **** 
   77:Core/Src/stm32f0xx_hal_msp.c ****   /* USER CODE END MspInit 1 */
   78:Core/Src/stm32f0xx_hal_msp.c **** }
-  69              		.loc 1 78 1 is_stmt 0 view .LVU13
-  70 0026 02B0     		add	sp, sp, #8
-  71              		@ sp needed
-  72 0028 7047     		bx	lr
-  73              	.L3:
-  74 002a C046     		.align	2
-  75              	.L2:
-  76 002c 00100240 		.word	1073876992
-  77              		.cfi_endproc
-  78              	.LFE40:
-  80              		.text
-  81              	.Letext0:
-  82              		.file 2 "C:\\ST\\STM32CubeIDE_1.19.0\\STM32CubeIDE\\plugins\\com.st.stm32cube.ide.mcu.externaltool
-  83              		.file 3 "C:\\ST\\STM32CubeIDE_1.19.0\\STM32CubeIDE\\plugins\\com.st.stm32cube.ide.mcu.externaltool
-  84              		.file 4 "Drivers/CMSIS/Device/ST/STM32F0xx/Include/stm32f051x8.h"
-ARM GAS  C:\Users\maari\AppData\Local\Temp\ccLaxqIj.s 			page 4
+  80              		.loc 1 78 1 is_stmt 0 view .LVU17
+  81 0026 02B0     		add	sp, sp, #8
+  82              		@ sp needed
+  83 0028 7047     		bx	lr
+  84              	.L4:
+  85 002a C046     		.align	2
+  86              	.L3:
+  87 002c 00100240 		.word	1073876992
+  88              		.cfi_endproc
+  89              	.LFE40:
+  91              		.text
+ARM GAS  C:\Users\maari\AppData\Local\Temp\cc42mrRr.s 			page 4
+
+
+  92              	.Letext0:
+  93              		.file 2 "C:\\ST\\STM32CubeIDE_1.19.0\\STM32CubeIDE\\plugins\\com.st.stm32cube.ide.mcu.externaltool
+  94              		.file 3 "C:\\ST\\STM32CubeIDE_1.19.0\\STM32CubeIDE\\plugins\\com.st.stm32cube.ide.mcu.externaltool
+  95              		.file 4 "Drivers/CMSIS/Device/ST/STM32F0xx/Include/stm32f051x8.h"
+ARM GAS  C:\Users\maari\AppData\Local\Temp\cc42mrRr.s 			page 5
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 stm32f0xx_hal_msp.c
-C:\Users\maari\AppData\Local\Temp\ccLaxqIj.s:19     .text.HAL_MspInit:00000000 $t
-C:\Users\maari\AppData\Local\Temp\ccLaxqIj.s:25     .text.HAL_MspInit:00000000 HAL_MspInit
-C:\Users\maari\AppData\Local\Temp\ccLaxqIj.s:76     .text.HAL_MspInit:0000002c $d
+C:\Users\maari\AppData\Local\Temp\cc42mrRr.s:19     .text.HAL_MspInit:00000000 $t
+C:\Users\maari\AppData\Local\Temp\cc42mrRr.s:26     .text.HAL_MspInit:00000000 HAL_MspInit
+C:\Users\maari\AppData\Local\Temp\cc42mrRr.s:87     .text.HAL_MspInit:0000002c $d
 
 NO UNDEFINED SYMBOLS
