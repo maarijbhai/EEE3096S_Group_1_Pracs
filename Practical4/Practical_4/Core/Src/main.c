@@ -34,9 +34,11 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 // TODO: Add values for below variables
-#define NS        // Number of samples in LUT
-#define TIM2CLK   // STM Clock frequency: Hint You might want to check the ioc file
-#define F_SIGNAL  	// Frequency of output analog signal
+#define NS    128    // Number of samples in LUT
+#define TIM2CLK  16000000 // STM Clock frequency: Hint You might want to check the ioc file
+#define F_SIGNAL  125000 	// Frequency of output analog signal
+
+// F_signal to be changed experimentally, starting at theoretical max, (TIM2CLK / NS)
 
 /* USER CODE END PD */
 
@@ -105,8 +107,6 @@ uint32_t Drum_LUT = { 2047, 3396, 1864, 2110, 2063, 3400, 1893, 1933, 2086, 2144
 		2043, 2049, 2098, 2047, 2065, 2047, 2923, 2071, 2017, 2080, 2018, 2049, 1831, 2014,
 		837, 2295, 1978, 2040, 1980, 2036, 2106, 2042, 1643, 2055, 2066, 2032, 2050, 2442,
 		2145, 2218, 2126, 2032, 2038, 1781, 2154, 2441, 2132, 4095, 2150, 2012, 2036, 1615, 1981, 323, 2525, 2047 };
-
-
 
 
 
