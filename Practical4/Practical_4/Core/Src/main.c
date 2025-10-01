@@ -37,6 +37,11 @@
 #define NS    128    // Number of samples in LUT
 #define TIM2CLK  16000000 // STM Clock frequency: Hint You might want to check the ioc file
 #define F_SIGNAL  125000 	// Frequency of output analog signal
+#define DEBOUNCE_DELAY_MS 50
+#define NUM_OF_WAVEFORM 6
+#define TIM2_Ticks (TIM2CLK / (NS * F_SIGNAL))
+
+
 
 // F_signal to be changed experimentally, starting at theoretical max, (TIM2CLK / NS)
 
@@ -54,6 +59,9 @@ DMA_HandleTypeDef hdma_tim2_ch1;
 
 /* USER CODE BEGIN PV */
 // TODO: Add code for global variables, including LUTs
+volatile uint32_t last_debounce_time = 0;
+volatile uint32_t current_waveform_index = 0;
+const char* WaveformNames[] = {"Sine", "Sawtooth", "Triangular", "Piano", "Guitar", "Drum"};
 uint32_t Sin_LUT[NS] =
 { 2048, 2148, 2248, 2348, 2447, 2545, 2642, 2737, 2831, 2923, 3012, 3100, 3185, 3267, 3346, 3422, 3495, 3564, 3630, 3692,
 		3750, 3803, 3853, 3898, 3939, 3975, 4006, 4033, 4055, 4072, 4085, 4092, 4095, 4092, 4085, 4072, 4055, 4033, 4006,
@@ -77,7 +85,7 @@ uint32_t Triangle_LUT[NS] = { 0, 65, 130, 195, 260, 325, 390, 455, 520, 585, 650
 		2080, 2015, 1950, 1885, 1820, 1755, 1690, 1625, 1560, 1495, 1430, 1365, 1300, 1235, 1170, 1105, 1040, 975, 910, 845, 780, 715, 650, 585, 520, 455,
 		390, 325, 260, 195, 130, 65, 0 };
 
-uint32_t Piano_LUT =
+uint32_t Piano_LUT[NS] =
 { 2047, 2183, 1984, 2098, 2061, 2088, 2038, 2158, 2097, 2153, 2084, 2054, 2016, 2333, 2059, 1765, 2027, 2045, 1970,
 	2055, 2063, 2051, 1583, 2022, 2334, 2044, 2884, 1692, 1759, 1843, 2242, 2195, 1531, 2163, 1969, 2061, 1987, 2088,
 	1733, 1952, 1934, 2101, 2252, 1924, 2253, 1929, 2616, 2030, 2097, 2063, 1985, 2063, 2024, 2037, 2818, 1944, 2393,
@@ -87,7 +95,7 @@ uint32_t Piano_LUT =
 	1997, 2072, 2031, 2060, 1942, 1911, 1604, 1780, 2077, 2056, 2001, 1938, 2094, 2047 };
 
 
-uint32_t Guitar_LUT =
+uint32_t Guitar_LUT[NS] =
 { 2047, 2362, 2360, 2123, 2097, 1861, 1833, 2015, 1534, 2092, 2080, 2052, 2087, 2075, 1893, 2036, 2043,
 	2027, 1705, 2501, 1916, 1896, 2466, 2231, 1775, 2052, 2015, 2062, 2036, 1994, 1964, 2054, 2052, 2098,
 	1856, 2149, 1858, 2127, 2003, 1750, 2249, 2024, 2056, 2052, 2064, 1933, 2144, 2041, 1876, 2006, 2183,
@@ -98,7 +106,7 @@ uint32_t Guitar_LUT =
 	1654, 2105, 1854, 2386, 1905, 1640, 2618, 1933, 2048 };
 
 
-uint32_t Drum_LUT = { 2047, 3396, 1864, 2110, 2063, 3400, 1893, 1933, 2086, 2144, 2036, 2030,
+uint32_t Drum_LUT[NS] = { 2047, 3396, 1864, 2110, 2063, 3400, 1893, 1933, 2086, 2144, 2036, 2030,
 		2039, 1949, 1414, 1848, 2091, 2032, 2044, 2059, 2048, 2093, 2044, 2020, 2094, 1803,
 		2072, 2045, 2173, 2017, 3235, 1276, 1671, 2193, 2436, 2104, 1931, 2062, 2028, 2032,
 		4095, 1922, 2035, 2042, 2502, 2372, 1820, 1996, 2284, 2072, 2018, 2051, 671, 2425,
@@ -111,8 +119,8 @@ uint32_t Drum_LUT = { 2047, 3396, 1864, 2110, 2063, 3400, 1893, 1933, 2086, 2144
 
 
 // TODO: Equation to calculate TIM2_Ticks
-uint32_t TIM2_Ticks = 0; // How often to write new LUT value
-TIM2_Ticks = TIM2CLK/(NS)*(F_SIGNAL); // The TIM2_Ticks equation (mj coded).
+//uint32_t TIM2_Ticks = 0; // How often to write new LUT value
+//TIM2_Ticks = TIM2CLK/(NS)*(F_SIGNAL); // The TIM2_Ticks equation (mj coded).
 uint32_t DestAddress = (uint32_t) &(TIM3->CCR3); // Write LUT TO TIM3->CCR3 to modify PWM duty cycle
 
 
@@ -165,25 +173,31 @@ int main(void)
   MX_DMA_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
+  //MX_LCD_Init();
   /* USER CODE BEGIN 2 */
   // TODO: Start TIM3 in PWM mode on channel 3
   //mj starting here:
+//idk about this one:
+ __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, TIM2_Ticks);
+
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
 
   // TODO: Start TIM2 in Output Compare (OC) mode on channel 1
-  HAL_TIM_OC_Start(&htim3, TIM_CHANNEL_1);
+  HAL_TIM_OC_Start(&htim2, TIM_CHANNEL_1);
 
   // TODO: Start DMA in IT mode on TIM2->CH1. Source is LUT and Dest is TIM3->CCR3; start with Sine LUT
-  HAL_DMA_Start_IT(TIM2->CH1, Sin_LUT, TIM3->CCR3, DataLength);
+  HAL_DMA_Start_IT(&hdma_tim2_ch1, (uint32_t)Sin_LUT, DestAddress, NS);
+
+
 
 
 
 
   // TODO: Write current waveform to LCD(Sine is the first waveform)
-  lcd_putsting("Sine");
+  lcd_putstring("Sine");
 
   // TODO: Enable DMA (start transfer from LUT to CCR)
-  _HAL_TIM_ENABLE_DMA(htim2,TIM_DMA_CC1);
+  __HAL_TIM_ENABLE_DMA(&htim2, TIM_DMA_CC1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -448,13 +462,48 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-void EXTI0_IRQHandler(void){
+void EXTI0_IRQHandler(void)
+{
 
 	// TODO: Debounce using HAL_GetTick()
+	uint32_t currentTime = HAL_GetTick();
+	if((currentTime - last_debounce_time) < DEBOUNCE_DELAY_MS )
+	{
+		return; //ignore if within debounce window
+	}
+
+	last_debounce_time = currentTime;
 
 
 	// TODO: Disable DMA transfer and abort IT, then start DMA in IT mode with new LUT and re-enable transfer
+
+    __HAL_TIM_DISABLE_DMA(&htim2, TIM_DMA_CC1);
+
+	 HAL_DMA_Abort_IT(&hdma_tim2_ch1);
+
 	// HINT: Consider using C's "switch" function to handle LUT changes
+
+	 //cycling the different waveforms:
+	 current_waveform_index = (current_waveform_index + 1) % NUM_OF_WAVEFORM;
+
+
+	 uint32_t *selectedLUT;
+
+	 switch(current_waveform_index)
+	 {
+	 	 case 0: selectedLUT = Sin_LUT; break;
+	 	 case 1: selectedLUT = Saw_LUT; break;
+	 	 case 2: selectedLUT = Triangle_LUT; break;
+	 	 case 3: selectedLUT = Piano_LUT; break;
+	 	 case 4: selectedLUT = Guitar_LUT; break;
+	 	 case 5: selectedLUT = Drum_LUT; break;
+	 }
+
+	 HAL_DMA_Start_IT(&hdma_tim2_ch1, (uint32_t)selectedLUT, DestAddress, NS);
+	 __HAL_TIM_ENABLE_DMA(&htim2, TIM_DMA_CC1);
+
+	 // Update LCD
+	 lcd_putstring((char*)WaveformNames[current_waveform_index]);
 
 
 
