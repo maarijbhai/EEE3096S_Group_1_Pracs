@@ -36,7 +36,7 @@
 // TODO: Add values for below variables
 #define NS    128    // Number of samples in LUT
 #define TIM2CLK  16000000 // STM Clock frequency: Hint You might want to check the ioc file
-#define F_SIGNAL  125000 	// Frequency of output analog signal
+#define F_SIGNAL  3000 	// Frequency of output analog signal, was 125000
 #define DEBOUNCE_DELAY_MS 50
 #define NUM_OF_WAVEFORM 6
 #define TIM2_Ticks (TIM2CLK / (NS * F_SIGNAL))
@@ -274,7 +274,8 @@ static void MX_TIM2_Init(void)
   htim2.Instance = TIM2;
   htim2.Init.Prescaler = 0;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 4294967295;
+  //htim2.Init.Period = 4294967295;
+  htim2.Init.Period = TIM2_Ticks - 1;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
