@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-LUT_SIZE = 10000
+LUT_SIZE = 4095
 
 # ----- Generate waveform LUTs -----
 # Sine LUT (12-bit)
@@ -17,9 +17,9 @@ triangle_lut = [int(i*(4095/(LUT_SIZE//2 -1)) if i < LUT_SIZE//2 else 4095 - (i 
 
 
 # ----- Print LUTs as C arrays -----
-print("uint16_t sineLUT[128] = {", ", ".join(map(str, sine_lut)), "};\n")
-print("uint16_t sawLUT[128] = {", ", ".join(map(str, saw_lut)), "};\n")
-print("uint16_t triangleLUT[128] = {", ", ".join(map(str, triangle_lut)), "};\n")
+print("uint16_t sineLUT[NS] = {", ", ".join(map(str, sine_lut)), "};\n")
+print("uint16_t sawLUT[NS] = {", ", ".join(map(str, saw_lut)), "};\n")
+print("uint16_t triangleLUT[NS] = {", ", ".join(map(str, triangle_lut)), "};\n")
 
 
 # ----- Plot all LUTs -----
